@@ -125,7 +125,7 @@ function updateHtml(html, mirroredByUrl) {
 
   if (!updated.includes("Takedown request</a>.")) {
     updated = updated.replace(
-      /(\s+with complementary angles, the image links are comma-separated in the same row\.)\s*<\/p>/,
+      /(\s+available complementary angles are grouped in the same row\.)\s*<\/p>/,
       `$1<br>
       For copyright or takedown requests, please submit a
       <a href="${TAKEDOWN_URL}" target="_blank" rel="noreferrer">GitHub issue titled Takedown request</a>.

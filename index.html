@@ -5,23 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tsang Tsou-choi Artwork Image Catalog</title>
   <style>
-    :root { color-scheme: light; --border: #d8d8d8; --muted: #666; --bg: #f7f7f5; }
+    :root { color-scheme: light; --border: #d8d8d8; --muted: #666; --bg: #f7f7f5; --toolbar-height: 0px; }
     * { box-sizing: border-box; }
     body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.4; color: #111; background: var(--bg); }
     header { padding: 24px 28px 12px; }
     h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: 0; }
     .summary { max-width: 980px; color: #333; font-size: 14px; }
-    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 12px 28px 18px; position: sticky; top: 0; z-index: 2; background: rgba(247,247,245,0.96); border-bottom: 1px solid var(--border); }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 12px 28px 18px; position: sticky; top: 0; z-index: 3; background: rgba(247,247,245,0.96); border-bottom: 1px solid var(--border); }
     input, select, button { font: inherit; border: 1px solid #aaa; background: #fff; border-radius: 4px; padding: 8px 10px; }
     input { min-width: 260px; flex: 1 1 280px; }
     button { cursor: pointer; }
     button:hover { background: #f0f0ee; }
     .count { color: var(--muted); font-size: 13px; margin-left: auto; }
     main { padding: 0 28px 36px; }
-    .table-wrap { overflow: auto; border: 1px solid var(--border); background: #fff; }
+    .table-wrap { overflow: visible; border: 1px solid var(--border); background: #fff; }
     table { width: 100%; border-collapse: collapse; min-width: 1160px; }
     th, td { border-bottom: 1px solid var(--border); padding: 8px 10px; vertical-align: top; text-align: left; }
-    th { position: sticky; top: 59px; background: #efefec; z-index: 1; font-size: 13px; }
+    th { position: sticky; top: var(--toolbar-height); background: #efefec; z-index: 2; font-size: 13px; }
     td { font-size: 13px; }
     tr:hover td { background: #fafaf8; }
     .thumb { width: 116px; }
@@ -42,8 +42,8 @@
     <p class="summary">
       Attempted image catalog assembled from M+ Collection records, Google Arts & Culture / Art Research Institute records,
       Ota Fine Arts, auction pages, Wikimedia Commons, HKU, and Hong Kong Walker. I treated unique collection/gallery/asset
-      records as distinct works unless an obvious duplicate photo of the same physical work appeared. For clear 3D/public objects
-      with complementary angles, the image links are comma-separated in the same row.<br>
+      records as distinct works unless an obvious duplicate photo of the same physical work appeared. For clear 3D/public objects,
+      available complementary angles are grouped in the same row.<br>
       For copyright or takedown requests, please submit a
       <a href="https://github.com/ayip001/tsang-tsou-choi-catalog/issues/new?title=Takedown%20request" target="_blank" rel="noreferrer">GitHub issue titled Takedown request</a>.
     </p>
@@ -66,7 +66,7 @@
             <th>Source</th>
             <th>Artwork title / location</th>
             <th>Est. year/date</th>
-            <th>Image link(s), comma-separated</th>
+            <th>Image link(s)</th>
             <th>Reference</th>
             <th>Notes</th>
           </tr>
@@ -255,6 +255,18 @@ const search = document.querySelector("#search");
 const tbody = document.querySelector("#rows");
 const count = document.querySelector("#count");
 const csvBox = document.querySelector("#csvBox");
+const toolbar = document.querySelector(".toolbar");
+
+function updateStickyOffset() {
+  document.documentElement.style.setProperty(
+    "--toolbar-height",
+    `${toolbar.getBoundingClientRect().height}px`,
+  );
+}
+
+new ResizeObserver(updateStickyOffset).observe(toolbar);
+window.addEventListener("resize", updateStickyOffset);
+updateStickyOffset();
 
 function csvEscape(value) {
   const v = String(value || "");
