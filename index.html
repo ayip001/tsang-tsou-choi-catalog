@@ -43,7 +43,9 @@
       Attempted image catalog assembled from M+ Collection records, Google Arts & Culture / Art Research Institute records,
       Ota Fine Arts, auction pages, Wikimedia Commons, HKU, and Hong Kong Walker. I treated unique collection/gallery/asset
       records as distinct works unless an obvious duplicate photo of the same physical work appeared. For clear 3D/public objects
-      with complementary angles, the image links are comma-separated in the same row.
+      with complementary angles, the image links are comma-separated in the same row.<br>
+      For copyright or takedown requests, please submit a
+      <a href="https://github.com/ayip001/tsang-tsou-choi-catalog/issues/new?title=Takedown%20request" target="_blank" rel="noreferrer">GitHub issue titled Takedown request</a>.
     </p>
   </header>
   <section class="toolbar">
@@ -157,6 +159,91 @@ HKU Teaching Site	Tsang Tsou Choi's Calligraphy Graffiti	1956-2007	https://learn
 HKU Museum / Virtual Exhibition	Untitled (HKU.Ca.2023.2643)		https://static.wixstatic.com/media/23c78b_353e71b0653e4b4e9f2c8c8a9fc83870~mv2.png/v1/fill/w_1602%2Ch_814%2Cal_c%2Cq_90%2Cusm_0.66_1.00_0.01%2Cenc_avif%2Cquality_auto/Kowloon%20King2_0_5x.png	https://virtual2.umag.hku.hk/copy-of-old-exhibits	marker on paper; 35 x 69 cm; gift of King of Kowloon Culture & Art Foundation
 Hong Kong Walker	Mong Kok railway bridge underpass work	rediscovered 2022; likely 1990s	https://www.hkwl.org/wp-content/uploads/2022/04/FotoJet-4_%E5%89%AF%E6%9C%AC.jpg?v=1649219047	https://www.hkwl.org/article/5419-%E3%80%8C%E4%B9%9D%E9%BE%8D%E7%9A%87%E5%B8%9D%E3%80%8D%E6%9B%BE%E7%81%B6%E8%B2%A1%E4%BD%9C%E5%93%81%E9%87%8D%E7%8F%BE%E6%97%BA%E8%A7%92%E9%90%B5%E8%B7%AF%E6%A9%8B%E4%B8%8B-%E6%88%96%E7%82%BA%E9%A6%99/	Composite news image; used because it documents a rediscovered public work`;
 
+const MIRRORED_IMAGES = {
+  "https://res.cloudinary.com/mplustms/image/upload/v1647571967/v2/prod/small/000501_001000/000768_003.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-001.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1627901149/v2/prod/small/001001_001500/001445_003.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-002.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1627883609/v2/prod/small/001001_001500/001446_003.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-003.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1627883601/v2/prod/small/001001_001500/001447_003.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-004.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1627883593/v2/prod/small/001001_001500/001448_003.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-005.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1627883586/v2/prod/small/001001_001500/001449_005.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-006.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1627883578/v2/prod/small/001001_001500/001450_003.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-007.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1627883640/v2/prod/small/001001_001500/001451_003.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-008.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1646101785/v2/prod/small/000001_000500/000168_001.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-009.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1678676237/v2/prod/small/000001_000500/000169_005.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-010.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1724382018/v2/prod/small/001501_002000/001699_001.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-011.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1627884072/v2/prod/small/001501_002000/001700_003.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-012.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1627828901/v2/prod/small/001501_002000/001701_001.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-013.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1627828923/v2/prod/small/001501_002000/001702_001.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-014.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1627828931/v2/prod/small/001501_002000/001703_001.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-015.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1724382458/v2/prod/small/001501_002000/001705_001.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-016.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1627828967/v2/prod/small/001501_002000/001706_001.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-017.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1627828982/v2/prod/small/001501_002000/001707_001.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-018.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1627828990/v2/prod/small/001501_002000/001708_001.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-019.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1627829004/v2/prod/small/001501_002000/001709_001.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-020.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1627829018/v2/prod/small/001501_002000/001710_001.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-021.jpg",
+  "https://res.cloudinary.com/mplustms/image/upload/v1627829033/v2/prod/small/001501_002000/001711_001.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/mplus-022.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_TdTC7cIaoEYfacMxlBCOkE8XIk1hlIUCDFgwV1rRUzf-HmuwEWqghExDragzr4XKNR1_phdw=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-001.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_R3r3KVKOU-oyLh_m-brY3scDaw9yFx_qaP-84Xe-IqKSVfp9UyE4oHsQxcSKK4v6aG7ImDsA=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-002.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_Tud2W6AIcQAjq3GYC2WvuhEElI5a--I_JDORnd0NjxdsEI_17iJro4SSWcHoP8QcvE-mIk=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-003.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_S8Xf204y_fuU1svgGxA_dxiBQqVKqNYrU8z-KP5p28NabKgQgPTyxZHamT2ylKrEJ2j48Ezw=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-004.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_Tu70VOJWSQLYCNavLMxwB1zmpS4uNk0rPnHH8q8Uft-wOHV-wpvJJlhRDg3a2obTrixD8wZQ=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-005.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_StlQdKtw5YlmZwr54kHiiMglqr2sZkQdj30fv3RcG0sNRT0oM8qvWLO5SgFvfE_jxgo17i7w=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-006.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_Qrv5cMoRmDXHMJzGc7aZmOFbZ5zuYjyeSFHv0EypWYo32QpjeETr-qj1cu8EDzph81QKfVlg=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-007.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_RMGz9MK7G1UJlhQBn78wEGzpD3W1VMXx4vKMxcv67vlOlidU0L4EptYkC1JHH-MfJ4GSPAHw=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-008.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_TQoMrA2amH_nAVVD5aaV_Xxm2tga7M0VdoS9n3mF-gVnUNTAcbs3Lqxc4MISbKf5HXel_33Gk=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-009.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_Q-Bs9vvzMLJkENlHP7oRLUJlQ_or23Xu67dZHlWMUii7psMjGGywvMFCc7Ofgq_0XXahAD1mc=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-010.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_T4KCaSm1FlqflT0fZfyvKcNijdAVmMHs8OgcUJWrHWsZjrBd2shjigE2svX-P2MvN3NATSZw=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-011.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_RkJNU6I289Hu_HC1VQlyiBlMe1vDbb-v5Dpkbppjfgdl6bl3OnPmZBgSMpXF6U1rRxDssnJw=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-012.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_QLhwgcHs-scSoDc0rpXUMMlcIV8nNJwt3c9BhWrvvWj8Jij4hF5jLE7bgbbslTU5eKv5IgMHQ=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-013.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_QDMqF0Wu_JISQFGjK9e1JmewiF-Rzjragq3E_8o-hltdTlHwuHMbeJf2uHhtvoQR4xAjJ4VN0=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-014.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_Q2g_AVvP6r2vVYJsYqjTaw3VJnYA8nIPESKV8JNZcX7yxIerFxXeZxV20Ya567chjh2C_z=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-015.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_QfdKzuh_60AW2_ZpKMfctEuX130AwGPhLKF_74_GvkeTdB8nfrAAi5ikBswYOc9hd0J532=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-016.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_ROFsbc2DGcPaomX3QloOjNS7P0l31ZX_mdIeZkYJUtbRcqdHP4hmluSl44pAp4kABJpcJb9w=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-017.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_RfJkFFbAp_l5TLHon1EzMvO9ZPB3bHWrKYmFeST2iL1By6iNt73BeYbF40mPXu9iFDgO5p=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-018.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_T3SgRmaao0yj1HRPX5mMFA08VOH8swVgHWWN7E4B512Tz2LSBc-zDMO9gKTHNobkd22kolCiA=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-019.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_TqVOuB0MQPH0srbRIzmaMbj_eAza6FDuKfh7YOvPX62jbV5PCkqIpw44at7207nQJnDcGrOQ=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-020.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_RcCCEFQdwzp9m6rNGe9ix7qlckaW-iB6MsqWm5TeNLmFBt4Q1t0awdaulP0HUcsIMAUSlYhg=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-021.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_QMhTA5eCqL0j0TOtoniYL_TKZmen4C1Y5XJS7E62kTrCgFmlHCCMX2LcTPaxoeTwPvG8kS7_k=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-022.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_TWliFUzYaoT1jvai-HxeOQjZr5xMx9FCMxYukWOiwVYj2Os73CAahn2NU_7x9STLjMtQKN=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-023.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_Q_bk0snRM_zjsubrZrClVQ1dx4Xl6e8EYyx8EXRuBBq96Rr5XYyMsowuDPgsUHqgf58ykuWWQ=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-024.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_Sxr7ybaacFVrDHMAFqnP-MCK74wPyfLfw9Vma7dX0WdMUE4IUZnC5em22BaVamywKKg7BG7A=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-025.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_QzO6y5gyt6ZD1UHvjL6ow3GTFAwRGNc8AgTAfbkids5pVivcCBVMSvjouLcaCs5ZG2VZxRc3w=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-026.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_QaUUxwWPzhjvrd0QZBFXbYwQn_jhHygId8dcNyw5d6ZPqQM96dQmWDMpC4yvZcV-a7FPWU=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-027.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_QdXyqDrZ6PoJt4IGOkgtoSnxTxsXm3ADRDBKmGPsjmnd497NCmh1qlVoIWJpamAgTAOdH5Gw=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-028.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_TCyVihMgjQF8Rm4NvhqRbnIUJr4n8tGnGPuB3ZoG1u-en-NgcZRNOIIw_MXr7q2iFA5Pit=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-029.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_RjK5xU8bdq6-WpgX4E4KjJtD8Nl7GE07nWo9BA0VQNmbzTaam6swDSP9AxhoNnDhxW6DggcQ=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-030.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_S3QbEKDGyzLE8kPl_DJgiY4PN-TbFyx80DPNxH__fA6_AzYiESNl9BDiZ5loNXvRA2a-spM4U=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-031.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_S-V7cZe3NJg9Q9R-MY7lJWo1Gxl4VeVxJ6hs-evHVI76mlvQw845CZAe0YbpKrhXun0MdH=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-032.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_R5KxG_5mxx8OiMZHFAfG4_FcXYe5IAUO_R0U5yZlD3v__mryPPLr8I6e_VWa__E_JMr8ZS=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-033.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_SR-mNRk58YWJvyyxpNsOIlsdAvYPBOQVjW8vN-uZ3K2JkXMsZ5_ALFds7Rof7vHe_FR62llQ=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-034.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_Qp3DBfVRgp8lpVwtx9GiVnxlwHScZmZCNJfT7R2VIky65cEBFBC65jk5j_ZS4VRTN3nFQBrg=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-035.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_THHYOFLY1DvjkgpSElEOmfzwyUlXpw3GOD97TndNWgxB5_-HTpDnH4bthhssahfaBg8VI8Ig=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-036.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_RVfhClHvvcfG8MW2RnOzHIQy_G8cBPCoTSgenvkPG1VMTIwKo7NBh19zgjUNhS5PPcJOwQmA=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-037.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_QIfJ_MvAMaa2y87X_zT1eDrwzZZCwIo671Q3fHs6fnCO3tNdrJMkjW1azVSwD6_gbTQeVnUBo=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-038.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_QdbDWTixWSGduFHe2raS0Kbfjq-61L2ideD2ykh-zjUAIwP9eCSRqw3XQ2_ZqWlydPpF53WV4=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-039.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_R-blmwdeN68Zg-DDaZEhB-iOmMdZPYbDqjFU3QIRHD4QRqN5G-Z-3ftyitu3dgRNFBhjfPkg=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-040.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_SKTP2X80iKEnw1pYGYlYimBbwbMCJ9rDJ1dHf2VVgMFmUek1K0wajjLfXwbLvDl4FHXJdXpfw=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-041.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_QrXia2Ew57GS-WhW42yc9jopyAlKv-zUTMpZHmdhQo-NH4fne1uvsDPawb64nz83YjRqz7aL6Y=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-042.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/e/e2/Tsang_graffiti_in_December_2023.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/wikimedia-001.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_RGseRVd8G4rsc1uPUJWsV5h4PNb7LDR14Ijk0d7egNlW3LpG8yd8dxfxlrSzI3t6v8f_lpyOA=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-043.jpg",
+  "https://lh3.googleusercontent.com/ci/AL18g_SCfgTGUaPxIFM8vj5NjEmBC3vHG4cFoCBtQD-BDPJycxm9j55VitkO9jvKrvZDuL8BUCaKQ18=s0": "https://angusyeet.com/tsang-tsou-choi-catalog/images/google-arts-044.jpg",
+  "https://static-assets.artlogic.net/w_3000%2Cc_limit%2Cf_auto%2Cfl_lossy%2Cq_auto/artlogicstorage/otafinearts/images/view/f299b0d5a133506288d854a26fffa6dej/otafinearts-tsang-tsou-choi-king-of-kowloon-untitled-2003.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/ota-001.webp",
+  "https://static-assets.artlogic.net/w_3000%2Cc_limit%2Cf_auto%2Cfl_lossy%2Cq_auto/artlogicstorage/otafinearts/images/view/04f007eebbb53a762ffe38128b36e1eaj/otafinearts-tsang-tsou-choi-king-of-kowloon-untitled-2001.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/ota-002.webp",
+  "https://static-assets.artlogic.net/w_3000%2Cc_limit%2Cf_auto%2Cfl_lossy%2Cq_auto/artlogicstorage/otafinearts/images/view/0b22198239ddf25233a3b0b6d1905420j/otafinearts-tsang-tsou-choi-king-of-kowloon-untitled-1994-2017.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/ota-003.webp",
+  "https://static-assets.artlogic.net/w_3000%2Cc_limit%2Cf_auto%2Cfl_lossy%2Cq_auto/artlogicstorage/otafinearts/images/view/4d0bfb909606c6fc6d1cdb8c0715b94fj/otafinearts-tsang-tsou-choi-king-of-kowloon-calligraphy-on-scooter-2002.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/ota-004.webp",
+  "https://static-assets.artlogic.net/w_3000%2Cc_limit%2Cf_auto%2Cfl_lossy%2Cq_auto/artlogicstorage/otafinearts/images/view/dcb97c9b8f9d1c04467c31605a0d4864j/otafinearts-tsang-tsou-choi-king-of-kowloon-untitled-2003.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/ota-005.webp",
+  "https://static-assets.artlogic.net/w_3000%2Cc_limit%2Cf_auto%2Cfl_lossy%2Cq_auto/artlogicstorage/otafinearts/images/view/a2879c6fb381f0a3b86e19759bd76155j/otafinearts-tsang-tsou-choi-king-of-kowloon-2002.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/ota-006.webp",
+  "https://sothebys-com.brightspotcdn.com/dims4/default/4d828a1/2147483647/strip/true/crop/2000x1907+0+0/resize/2880x2748!/quality/90/?url=http%3A%2F%2Fsothebys-brightspot-migration.s3.amazonaws.com%2F4b%2F48%2Fe0%2F643a946d3cbe09a9b5fbee64be5cc6aa027d0d616285cc11510b297fd4%2F059hk0686-8y5g3.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/sothebys-001.jpg",
+  "https://www.christies.com/img/LotImages/2022/HGK/2022_HGK_19900_0164_000(tsang_tsou_choi_untitled062800).jpg?mode=max": "https://angusyeet.com/tsang-tsou-choi-catalog/images/christies-001.jpg",
+  "https://www.christies.com/img/LotImages/2022/HGK/2022_HGK_19900_0164_001(tsang_tsou_choi_untitled062807).jpg?mode=max": "https://angusyeet.com/tsang-tsou-choi-catalog/images/christies-002.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/2/2f/Emperor_of_Kowloon%2C_Hung_Hom_%E7%B4%85%E7%A3%A1_%286310519734%29.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/wikimedia-002.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/6/65/Tsang_Graffiti_191210_1.JPG": "https://angusyeet.com/tsang-tsou-choi-catalog/images/wikimedia-003.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/1/1d/Tsang_Graffiti_191210_2.JPG": "https://angusyeet.com/tsang-tsou-choi-catalog/images/wikimedia-004.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/5/5b/Tsang_Graffiti_191210_3.JPG": "https://angusyeet.com/tsang-tsou-choi-catalog/images/wikimedia-005.jpg",
+  "https://learning.hku.hk/ccch9051/group-24/files/original/c3e0825ffefabdd8896fe5ccc55d6462.jpg": "https://angusyeet.com/tsang-tsou-choi-catalog/images/hku-teaching-001.jpg",
+  "https://static.wixstatic.com/media/23c78b_353e71b0653e4b4e9f2c8c8a9fc83870~mv2.png/v1/fill/w_1602%2Ch_814%2Cal_c%2Cq_90%2Cusm_0.66_1.00_0.01%2Cenc_avif%2Cquality_auto/Kowloon%20King2_0_5x.png": "https://angusyeet.com/tsang-tsou-choi-catalog/images/hku-museum-001.avif",
+  "https://www.hkwl.org/wp-content/uploads/2022/04/FotoJet-4_%E5%89%AF%E6%9C%AC.jpg?v=1649219047": "https://angusyeet.com/tsang-tsou-choi-catalog/images/hkwalker-001.webp"
+};
 const headers = ["Source", "Title", "Est. year/date", "Image link(s)", "Reference", "Notes"];
 const rows = ROWS_TSV.trim().split("\n").slice(1).map(line => {
   const cells = line.split("\t");
@@ -179,7 +266,8 @@ function toCsv(data) {
 }
 
 function firstImage(images) {
-  return images.split(",").map(s => s.trim()).filter(Boolean)[0] || "";
+  const original = images.split(",").map(s => s.trim()).filter(Boolean)[0] || "";
+  return MIRRORED_IMAGES[original] || original;
 }
 
 function render() {
