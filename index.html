@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tsang Tsou-choi Artwork Image Catalog</title>
+  <style>
+    :root { color-scheme: light; --border: #d8d8d8; --muted: #666; --bg: #f7f7f5; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.4; color: #111; background: var(--bg); }
+    header { padding: 24px 28px 12px; }
+    h1 { margin: 0 0 8px; font-size: 28px; letter-spacing: 0; }
+    .summary { max-width: 980px; color: #333; font-size: 14px; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 12px 28px 18px; position: sticky; top: 0; z-index: 2; background: rgba(247,247,245,0.96); border-bottom: 1px solid var(--border); }
+    input, select, button { font: inherit; border: 1px solid #aaa; background: #fff; border-radius: 4px; padding: 8px 10px; }
+    input { min-width: 260px; flex: 1 1 280px; }
+    button { cursor: pointer; }
+    button:hover { background: #f0f0ee; }
+    .count { color: var(--muted); font-size: 13px; margin-left: auto; }
+    main { padding: 0 28px 36px; }
+    .table-wrap { overflow: auto; border: 1px solid var(--border); background: #fff; }
+    table { width: 100%; border-collapse: collapse; min-width: 1160px; }
+    th, td { border-bottom: 1px solid var(--border); padding: 8px 10px; vertical-align: top; text-align: left; }
+    th { position: sticky; top: 59px; background: #efefec; z-index: 1; font-size: 13px; }
+    td { font-size: 13px; }
+    tr:hover td { background: #fafaf8; }
+    .thumb { width: 116px; }
+    .thumb img { display: block; width: 96px; height: 96px; object-fit: contain; background: #eee; border: 1px solid #ddd; }
+    .source { white-space: nowrap; color: #333; }
+    .date { width: 132px; color: #222; }
+    .title { min-width: 220px; font-weight: 600; }
+    .links { max-width: 390px; word-break: break-all; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; }
+    .notes { color: #333; max-width: 280px; }
+    .muted { color: var(--muted); }
+    a { color: #0645ad; }
+    #csvBox { width: 100%; height: 160px; margin-top: 14px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; display: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Tsang Tsou-choi / "Emperor of Kowloon" Artwork Image Catalog</h1>
+    <p class="summary">
+      Attempted image catalog assembled from M+ Collection records, Google Arts & Culture / Art Research Institute records,
+      Ota Fine Arts, auction pages, Wikimedia Commons, HKU, and Hong Kong Walker. I treated unique collection/gallery/asset
+      records as distinct works unless an obvious duplicate photo of the same physical work appeared. For clear 3D/public objects
+      with complementary angles, the image links are comma-separated in the same row.
+    </p>
+  </header>
+  <section class="toolbar">
+    <input id="search" type="search" placeholder="Search title, source, notes, or date">
+    <select id="sourceFilter">
+      <option value="">All sources</option>
+    </select>
+    <button id="copyCsv" type="button">Copy CSV</button>
+    <button id="toggleCsv" type="button">Show CSV</button>
+    <span id="count" class="count"></span>
+  </section>
+  <main>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Preview</th>
+            <th>Source</th>
+            <th>Artwork title / location</th>
+            <th>Est. year/date</th>
+            <th>Image link(s), comma-separated</th>
+            <th>Reference</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <textarea id="csvBox" readonly></textarea>
+  </main>
+  <script>
+const ROWS_TSV = String.raw`Source	Title	Est. year/date	Image link(s)	Reference	Notes
+M+ Collection	Doors	2003	https://res.cloudinary.com/mplustms/image/upload/v1647571967/v2/prod/small/000501_001000/000768_003.jpg	https://www.mplus.org.hk/en/collection/objects/doors-20121515/	ink on wooden doors
+M+ Collection	Untitled 0096-005	photographed 2003, printed 2012	https://res.cloudinary.com/mplustms/image/upload/v1627901149/v2/prod/small/001001_001500/001445_003.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-0096-005-20121666/	pigment print on metallic paper
+M+ Collection	Untitled 0096-017	photographed 2003, printed 2012	https://res.cloudinary.com/mplustms/image/upload/v1627883609/v2/prod/small/001001_001500/001446_003.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-0096-017-20121667/	inkjet print on metallic paper
+M+ Collection	Untitled 0096-023	photographed 2003, printed 2012	https://res.cloudinary.com/mplustms/image/upload/v1627883601/v2/prod/small/001001_001500/001447_003.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-0096-023-20121668/	pigment print on metallic paper
+M+ Collection	Untitled 0096-026	photographed 2003, printed 2012	https://res.cloudinary.com/mplustms/image/upload/v1627883593/v2/prod/small/001001_001500/001448_003.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-0096-026-20121669/	pigment print on metallic paper
+M+ Collection	Untitled 096-030	photographed 2003, printed 2012	https://res.cloudinary.com/mplustms/image/upload/v1627883586/v2/prod/small/001001_001500/001449_005.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-096-030-20121670/	pigment print on metallic paper
+M+ Collection	Untitled 096-032	photographed 2003, printed 2012	https://res.cloudinary.com/mplustms/image/upload/v1627883578/v2/prod/small/001001_001500/001450_003.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-096-032-20121671/	pigment print on metallic paper
+M+ Collection	Untitled 096-034	photographed 2003, printed 2012	https://res.cloudinary.com/mplustms/image/upload/v1627883640/v2/prod/small/001001_001500/001451_003.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-096-034-20121672/	pigment print on metallic paper
+M+ Collection	Untitled	1990s	https://res.cloudinary.com/mplustms/image/upload/v1646101785/v2/prod/small/000001_000500/000168_001.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-20137/	ink on iron gates
+M+ Collection	Untitled (Partial Map of Kowloon)	circa 1994-1997	https://res.cloudinary.com/mplustms/image/upload/v1678676237/v2/prod/small/000001_000500/000169_005.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-partial-map-of-kowloon-201334/	ink on printed paper
+M+ Collection	Untitled (TTC_C49-00)	circa 1997	https://res.cloudinary.com/mplustms/image/upload/v1724382018/v2/prod/small/001501_002000/001699_001.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-ttc-c49-00-2013243/	ink on nylon cloth
+M+ Collection	Untitled (TT-C47-00)	1997	https://res.cloudinary.com/mplustms/image/upload/v1627884072/v2/prod/small/001501_002000/001700_003.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-tt-c47-00-2013244/	ink on canvas curtain
+M+ Collection	Untitled	circa 2004-2007	https://res.cloudinary.com/mplustms/image/upload/v1627828901/v2/prod/small/001501_002000/001701_001.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-2013245/	marker on paper
+M+ Collection	Untitled	circa 2004-2007	https://res.cloudinary.com/mplustms/image/upload/v1627828923/v2/prod/small/001501_002000/001702_001.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-2013246/	marker on paper
+M+ Collection	Untitled	circa 2004-2007	https://res.cloudinary.com/mplustms/image/upload/v1627828931/v2/prod/small/001501_002000/001703_001.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-2013247/	marker on paper
+M+ Collection	Untitled	circa 2004-2007	https://res.cloudinary.com/mplustms/image/upload/v1724382458/v2/prod/small/001501_002000/001705_001.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-2013248/	marker on paper
+M+ Collection	Untitled	circa 2004-2007	https://res.cloudinary.com/mplustms/image/upload/v1627828967/v2/prod/small/001501_002000/001706_001.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-2013249/	marker on paper
+M+ Collection	Untitled	circa 2004-2007	https://res.cloudinary.com/mplustms/image/upload/v1627828982/v2/prod/small/001501_002000/001707_001.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-2013250/	marker on paper
+M+ Collection	Untitled	2005	https://res.cloudinary.com/mplustms/image/upload/v1627828990/v2/prod/small/001501_002000/001708_001.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-2013251/	marker on paper
+M+ Collection	Untitled	2004	https://res.cloudinary.com/mplustms/image/upload/v1627829004/v2/prod/small/001501_002000/001709_001.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-2013252/	marker on paper
+M+ Collection	Untitled	2004	https://res.cloudinary.com/mplustms/image/upload/v1627829018/v2/prod/small/001501_002000/001710_001.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-2013253/	marker on paper
+M+ Collection	Untitled	2004	https://res.cloudinary.com/mplustms/image/upload/v1627829033/v2/prod/small/001501_002000/001711_001.jpg	https://www.mplus.org.hk/en/collection/objects/untitled-2013309/	marker on paper
+Google Arts & Culture	Central, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_TdTC7cIaoEYfacMxlBCOkE8XIk1hlIUCDFgwV1rRUzf-HmuwEWqghExDragzr4XKNR1_phdw=s0	https://artsandculture.google.com/asset/central-hong-kong-tsang-tsou-choi-king-of-kowloon/OAFWHvSL2npfkg	Art Research Institute asset
+Google Arts & Culture	Sai Ying Pun, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_R3r3KVKOU-oyLh_m-brY3scDaw9yFx_qaP-84Xe-IqKSVfp9UyE4oHsQxcSKK4v6aG7ImDsA=s0	https://artsandculture.google.com/asset/sai-ying-pun-hong-kong-tsang-tsou-choi-king-of-kowloon/lwE8voRGJcz3Xg	Art Research Institute asset
+Google Arts & Culture	Wong Tai Sin, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_Tud2W6AIcQAjq3GYC2WvuhEElI5a--I_JDORnd0NjxdsEI_17iJro4SSWcHoP8QcvE-mIk=s0	https://artsandculture.google.com/asset/wong-tai-sin-hong-kong-tsang-tsou-choi-king-of-kowloon/_QFLZc-PtZjAMg	Art Research Institute asset
+Google Arts & Culture	Calligraphy on car	1996	https://lh3.googleusercontent.com/ci/AL18g_S8Xf204y_fuU1svgGxA_dxiBQqVKqNYrU8z-KP5p28NabKgQgPTyxZHamT2ylKrEJ2j48Ezw=s0	https://artsandculture.google.com/asset/calligraphy-on-car-tsang-tsou-choi-king-of-kowloon/ywHCi8dBUYpWpw	3D object; one strong available view found
+Google Arts & Culture	Kwun Tong, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_Tu70VOJWSQLYCNavLMxwB1zmpS4uNk0rPnHH8q8Uft-wOHV-wpvJJlhRDg3a2obTrixD8wZQ=s0	https://artsandculture.google.com/asset/kwun-tong-hong-kong-tsang-tsou-choi-king-of-kowloon/OgFCC5I9y9KJOQ	Art Research Institute asset
+Google Arts & Culture	Sai Wan, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_StlQdKtw5YlmZwr54kHiiMglqr2sZkQdj30fv3RcG0sNRT0oM8qvWLO5SgFvfE_jxgo17i7w=s0	https://artsandculture.google.com/asset/sai-wan-hong-kong-tsang-tsou-choi-king-of-kowloon/LAEgpk1d7sG_dg	Art Research Institute asset
+Google Arts & Culture	Sau Mau Ping, Hong Kong	1992	https://lh3.googleusercontent.com/ci/AL18g_Qrv5cMoRmDXHMJzGc7aZmOFbZ5zuYjyeSFHv0EypWYo32QpjeETr-qj1cu8EDzph81QKfVlg=s0	https://artsandculture.google.com/asset/sau-mau-ping-hong-kong-tsang-tsou-choi-king-of-kowloon/WgG3NJ_Aymb1AA	Art Research Institute asset
+Google Arts & Culture	Argyle Street at Sai Yee Street, Mong Kok, Kowloon	2007	https://lh3.googleusercontent.com/ci/AL18g_RMGz9MK7G1UJlhQBn78wEGzpD3W1VMXx4vKMxcv67vlOlidU0L4EptYkC1JHH-MfJ4GSPAHw=s0	https://artsandculture.google.com/asset/argyle-street-at-sai-yee-street-mong-kok-kowloon-hong-kong-tsang-tsou-choi-king-of-kowloon/-gGa0Y13XPFYAQ	Art Research Institute asset
+Google Arts & Culture	Jackson Road, Central, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_TQoMrA2amH_nAVVD5aaV_Xxm2tga7M0VdoS9n3mF-gVnUNTAcbs3Lqxc4MISbKf5HXel_33Gk=s0	https://artsandculture.google.com/asset/jackson-road-central-hong-kong-tsang-tsou-choi-king-of-kowloon/0AEyr_4E-whEMg	Art Research Institute asset
+Google Arts & Culture	Central, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_Q-Bs9vvzMLJkENlHP7oRLUJlQ_or23Xu67dZHlWMUii7psMjGGywvMFCc7Ofgq_0XXahAD1mc=s0	https://artsandculture.google.com/asset/central-hong-kong-tsang-tsou-choi-king-of-kowloon/4gFjQME8Ua8Zng	Art Research Institute asset
+Google Arts & Culture	Wong Tai Sin, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_T4KCaSm1FlqflT0fZfyvKcNijdAVmMHs8OgcUJWrHWsZjrBd2shjigE2svX-P2MvN3NATSZw=s0	https://artsandculture.google.com/asset/wong-tai-sin-hong-kong-tsang-tsou-choi-king-of-kowloon/ngGUGoBIO-GuKg	Separate Google asset with same location title
+Google Arts & Culture	Central, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_RkJNU6I289Hu_HC1VQlyiBlMe1vDbb-v5Dpkbppjfgdl6bl3OnPmZBgSMpXF6U1rRxDssnJw=s0	https://artsandculture.google.com/asset/central-hong-kong-tsang-tsou-choi-king-of-kowloon/hwEx50IBSsaqzQ	Separate Google asset with same location title
+Google Arts & Culture	Sai Ying Pun, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_QLhwgcHs-scSoDc0rpXUMMlcIV8nNJwt3c9BhWrvvWj8Jij4hF5jLE7bgbbslTU5eKv5IgMHQ=s0	https://artsandculture.google.com/asset/sai-ying-pun-hong-kong-tsang-tsou-choi-king-of-kowloon/pwFRNUiY5_Hr1A	Separate Google asset with same location title
+Google Arts & Culture	Kowloon Bay, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_QDMqF0Wu_JISQFGjK9e1JmewiF-Rzjragq3E_8o-hltdTlHwuHMbeJf2uHhtvoQR4xAjJ4VN0=s0	https://artsandculture.google.com/asset/kowloon-bay-hong-kong-tsang-tsou-choi-and-king-of-kowloon/rQF2TWzVf330KQ	Art Research Institute asset
+Google Arts & Culture	Sau Mau Ping, Hong Kong	1992	https://lh3.googleusercontent.com/ci/AL18g_Q2g_AVvP6r2vVYJsYqjTaw3VJnYA8nIPESKV8JNZcX7yxIerFxXeZxV20Ya567chjh2C_z=s0	https://artsandculture.google.com/asset/sau-mau-ping-hong-kong-tsang-tsou-choi-and-king-of-kowloon/IQEhVr5TD-6ssg	Separate Google asset with same location title
+Google Arts & Culture	Sau Mau Ping, Hong Kong	1992	https://lh3.googleusercontent.com/ci/AL18g_QfdKzuh_60AW2_ZpKMfctEuX130AwGPhLKF_74_GvkeTdB8nfrAAi5ikBswYOc9hd0J532=s0	https://artsandculture.google.com/asset/sau-mau-ping-hong-kong-tsang-tsou-choi-king-of-kowloon/tgF0VqFnUzjNpw	Separate Google asset with same location title
+Google Arts & Culture	Sau Mau Ping, Hong Kong	1992	https://lh3.googleusercontent.com/ci/AL18g_ROFsbc2DGcPaomX3QloOjNS7P0l31ZX_mdIeZkYJUtbRcqdHP4hmluSl44pAp4kABJpcJb9w=s0	https://artsandculture.google.com/asset/sau-mau-ping-hong-kong-tsang-tsou-choi-king-of-kowloon/pwHks8tq67-6SA	Separate Google asset with same location title
+Google Arts & Culture	Battery Path, Central, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_RfJkFFbAp_l5TLHon1EzMvO9ZPB3bHWrKYmFeST2iL1By6iNt73BeYbF40mPXu9iFDgO5p=s0	https://artsandculture.google.com/asset/battery-path-central-hong-kong-tsang-tsou-choi-king-of-kowloon/HwEviVkysHdvtQ	Art Research Institute asset
+Google Arts & Culture	Kwun Tong, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_T3SgRmaao0yj1HRPX5mMFA08VOH8swVgHWWN7E4B512Tz2LSBc-zDMO9gKTHNobkd22kolCiA=s0	https://artsandculture.google.com/asset/kwun-tong-hong-kong-tsang-tsou-choi-king-of-kowloon/OwHpL9B0wzCqNQ	Separate Google asset with same location title
+Google Arts & Culture	Fu Yan Street, Kwun Tong, Hong Kong	1999	https://lh3.googleusercontent.com/ci/AL18g_TqVOuB0MQPH0srbRIzmaMbj_eAza6FDuKfh7YOvPX62jbV5PCkqIpw44at7207nQJnDcGrOQ=s0	https://artsandculture.google.com/asset/fu-yan-street-kwun-tong-hong-kong-tsang-tsou-choi-king-of-kowloon/GAEmJLfVfe2-LQ	Art Research Institute asset
+Google Arts & Culture	Salisbury Road, Tsim Sha Tsui, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_RcCCEFQdwzp9m6rNGe9ix7qlckaW-iB6MsqWm5TeNLmFBt4Q1t0awdaulP0HUcsIMAUSlYhg=s0	https://artsandculture.google.com/asset/salisbury-road-tsim-sha-tsui-hong-kong-tsang-tsou-choi-king-of-kowloon/cQGA5W14xvs7Bg	Historical Google asset
+Google Arts & Culture	Salisbury Road, Tsim Sha Tsui, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_QMhTA5eCqL0j0TOtoniYL_TKZmen4C1Y5XJS7E62kTrCgFmlHCCMX2LcTPaxoeTwPvG8kS7_k=s0	https://artsandculture.google.com/asset/salisbury-road-tsim-sha-tsui-hong-kong-tsang-tsou-choi-king-of-kowloon/uwF8zuHmAAFt1w	Separate Google asset with same location title
+Google Arts & Culture	Kwun Tong, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_TWliFUzYaoT1jvai-HxeOQjZr5xMx9FCMxYukWOiwVYj2Os73CAahn2NU_7x9STLjMtQKN=s0	https://artsandculture.google.com/asset/kwun-tong-hong-kong-tsang-tsou-choi-king-of-kowloon/rwFln__MWRh5aw	Separate Google asset with same location title
+Google Arts & Culture	Sai Ying Pun, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_Q_bk0snRM_zjsubrZrClVQ1dx4Xl6e8EYyx8EXRuBBq96Rr5XYyMsowuDPgsUHqgf58ykuWWQ=s0	https://artsandculture.google.com/asset/sai-ying-pun-hong-kong-tsang-tsou-choi-king-of-kowloon/igGJmNFUUqRLrg	Separate Google asset with same location title
+Google Arts & Culture	Queen's Road Central, Central, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_Sxr7ybaacFVrDHMAFqnP-MCK74wPyfLfw9Vma7dX0WdMUE4IUZnC5em22BaVamywKKg7BG7A=s0	https://artsandculture.google.com/asset/queen-s-road-central-central-hong-kong-tsang-tsou-choi-king-of-kowloon/jgHdq6kkp6IETw	Art Research Institute asset
+Google Arts & Culture	Connaught Road, Central, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_QzO6y5gyt6ZD1UHvjL6ow3GTFAwRGNc8AgTAfbkids5pVivcCBVMSvjouLcaCs5ZG2VZxRc3w=s0	https://artsandculture.google.com/asset/connaught-road-central-hong-kong-tsang-tsou-choi-and-king-of-kowloon/pgG2JikQ0kkBdg	Art Research Institute asset
+Google Arts & Culture	Edinburgh Place, Central, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_QaUUxwWPzhjvrd0QZBFXbYwQn_jhHygId8dcNyw5d6ZPqQM96dQmWDMpC4yvZcV-a7FPWU=s0	https://artsandculture.google.com/asset/edinburgh-place-central-hong-kong-tsang-tsou-choi-and-king-of-kowloon/zAGDi8ZvNHhllA	Art Research Institute asset
+Google Arts & Culture	Garden Road, Central, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_QdXyqDrZ6PoJt4IGOkgtoSnxTxsXm3ADRDBKmGPsjmnd497NCmh1qlVoIWJpamAgTAOdH5Gw=s0	https://artsandculture.google.com/asset/garden-road-central-hong-kong-tsang-tsou-choi-and-king-of-kowloon/8AG8gG7FOFgIfg	Art Research Institute asset
+Google Arts & Culture	Central, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_TCyVihMgjQF8Rm4NvhqRbnIUJr4n8tGnGPuB3ZoG1u-en-NgcZRNOIIw_MXr7q2iFA5Pit=s0	https://artsandculture.google.com/asset/central-hong-kong-tsang-tsou-choi-and-king-of-kowloon/pQF7d_mhCjmD3Q	Separate Google asset with same location title
+Google Arts & Culture	Central, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_RjK5xU8bdq6-WpgX4E4KjJtD8Nl7GE07nWo9BA0VQNmbzTaam6swDSP9AxhoNnDhxW6DggcQ=s0	https://artsandculture.google.com/asset/central-hong-kong-tsang-tsou-choi-and-king-of-kowloon/JQGjNSExDTeYMQ	Separate Google asset with same location title
+Google Arts & Culture	Tsim Sha Tsui, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_S3QbEKDGyzLE8kPl_DJgiY4PN-TbFyx80DPNxH__fA6_AzYiESNl9BDiZ5loNXvRA2a-spM4U=s0	https://artsandculture.google.com/asset/tsim-sha-tsui-hong-kong-tsang-tsou-choi-and-king-of-kowloon/fAHkYmoHoKc26Q	Art Research Institute asset
+Google Arts & Culture	Salisbury Road, Tsim Sha Tsui, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_S-V7cZe3NJg9Q9R-MY7lJWo1Gxl4VeVxJ6hs-evHVI76mlvQw845CZAe0YbpKrhXun0MdH=s0	https://artsandculture.google.com/asset/salisbury-road-tsim-sha-tsui-hong-kong-tsang-tsou-choi-king-of-kowloon/ZAECU5Si0L1vow	Separate Google asset with same location title
+Google Arts & Culture	Tsim Sha Tsui, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_R5KxG_5mxx8OiMZHFAfG4_FcXYe5IAUO_R0U5yZlD3v__mryPPLr8I6e_VWa__E_JMr8ZS=s0	https://artsandculture.google.com/asset/tsim-sha-tsui-hong-kong-tsang-tsou-choi-king-of-kowloon/eAHn_iXt2n-J9A	Separate Google asset with same location title
+Google Arts & Culture	Tsim Sha Tsui, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_SR-mNRk58YWJvyyxpNsOIlsdAvYPBOQVjW8vN-uZ3K2JkXMsZ5_ALFds7Rof7vHe_FR62llQ=s0	https://artsandculture.google.com/asset/tsim-sha-tsui-hong-kong-tsang-tsou-choi-and-king-of-kowloon/xQGXwIOq1JMteQ	Separate Google asset with same location title
+Google Arts & Culture	Salisbury Road, Tsim Sha Tsui, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_Qp3DBfVRgp8lpVwtx9GiVnxlwHScZmZCNJfT7R2VIky65cEBFBC65jk5j_ZS4VRTN3nFQBrg=s0	https://artsandculture.google.com/asset/salisbury-road-tsim-sha-tsui-hong-kong-tsang-tsou-choi-king-of-kowloon/9AHBgRJx5M6zOQ	Separate Google asset with same location title
+Google Arts & Culture	Kwun Tong, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_THHYOFLY1DvjkgpSElEOmfzwyUlXpw3GOD97TndNWgxB5_-HTpDnH4bthhssahfaBg8VI8Ig=s0	https://artsandculture.google.com/asset/kwun-tong-hong-kong-tsang-tsou-choi-and-king-of-kowloon/BwHbDqjQ-4YwHQ	Separate Google asset with same location title
+Google Arts & Culture	Kwun Tong, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_RVfhClHvvcfG8MW2RnOzHIQy_G8cBPCoTSgenvkPG1VMTIwKo7NBh19zgjUNhS5PPcJOwQmA=s0	https://artsandculture.google.com/asset/kwun-tong-hong-kong-tsang-tsou-choi-king-of-kowloon/HwGUTiGVQV7f9w	Separate Google asset with same location title
+Google Arts & Culture	Kwun Tong, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_QIfJ_MvAMaa2y87X_zT1eDrwzZZCwIo671Q3fHs6fnCO3tNdrJMkjW1azVSwD6_gbTQeVnUBo=s0	https://artsandculture.google.com/asset/kwun-tong-hong-kong-tsang-tsou-choi-and-king-of-kowloon/GQG0KGyMlZkojQ	Separate Google asset with same location title
+Google Arts & Culture	Kwun Tong, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_QdbDWTixWSGduFHe2raS0Kbfjq-61L2ideD2ykh-zjUAIwP9eCSRqw3XQ2_ZqWlydPpF53WV4=s0	https://artsandculture.google.com/asset/kwun-tong-hong-kong-tsang-tsou-choi-king-of-kowloon/nQE2a9-nMP-7Pg	Separate Google asset with same location title
+Google Arts & Culture	Kwun Tong, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_R-blmwdeN68Zg-DDaZEhB-iOmMdZPYbDqjFU3QIRHD4QRqN5G-Z-3ftyitu3dgRNFBhjfPkg=s0	https://artsandculture.google.com/asset/kwun-tong-hong-kong-tsang-tsou-choi-king-of-kowloon/fQEoSUFcODUOzw	Separate Google asset with same location title
+Google Arts & Culture	Public bus from Kwun Tong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_SKTP2X80iKEnw1pYGYlYimBbwbMCJ9rDJ1dHf2VVgMFmUek1K0wajjLfXwbLvDl4FHXJdXpfw=s0	https://artsandculture.google.com/asset/public-bus-from-kwun-tong-tsang-tsou-choi-king-of-kowloon/RwEF4r_asc0mHA	3D/vehicle work; one strong available view found
+Google Arts & Culture	Salisbury Road / Star Ferry protected column, Tsim Sha Tsui	1999	https://lh3.googleusercontent.com/ci/AL18g_QrXia2Ew57GS-WhW42yc9jopyAlKv-zUTMpZHmdhQo-NH4fne1uvsDPawb64nz83YjRqz7aL6Y=s0, https://upload.wikimedia.org/wikipedia/commons/e/e2/Tsang_graffiti_in_December_2023.jpg	https://artsandculture.google.com/asset/salisbury-road-tsim-sha-tsui-hong-kong-tsang-tsou-choi-and-king-of-kowloon/QgHBfANRLx1jUg	Known surviving cylindrical public work; second link is Wikimedia Commons 2023 angle
+Google Arts & Culture	Ngau Chi Wan, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_RGseRVd8G4rsc1uPUJWsV5h4PNb7LDR14Ijk0d7egNlW3LpG8yd8dxfxlrSzI3t6v8f_lpyOA=s0	https://artsandculture.google.com/asset/ngau-chi-wan-hong-kong-tsang-tsou-choi-king-of-kowloon/QQE1_OnH3PXXGA	Last Six Works exhibit
+Google Arts & Culture	Choi Hung, Hong Kong	1996-1997	https://lh3.googleusercontent.com/ci/AL18g_SCfgTGUaPxIFM8vj5NjEmBC3vHG4cFoCBtQD-BDPJycxm9j55VitkO9jvKrvZDuL8BUCaKQ18=s0	https://artsandculture.google.com/asset/choi-hung-hong-kong-tsang-tsou-choi-king-of-kowloon/EAFO89C15pCAwA	Last Six Works exhibit
+Ota Fine Arts	Untitled	2003	https://static-assets.artlogic.net/w_3000%2Cc_limit%2Cf_auto%2Cfl_lossy%2Cq_auto/artlogicstorage/otafinearts/images/view/f299b0d5a133506288d854a26fffa6dej/otafinearts-tsang-tsou-choi-king-of-kowloon-untitled-2003.jpg	https://www.otafinearts.com/artworks/3203-tsang-tsou-choi-king-of-kowloon-untitled-2003/	ink on paper mounted on board; 77.6 x 108.5 cm
+Ota Fine Arts	Untitled	2001	https://static-assets.artlogic.net/w_3000%2Cc_limit%2Cf_auto%2Cfl_lossy%2Cq_auto/artlogicstorage/otafinearts/images/view/04f007eebbb53a762ffe38128b36e1eaj/otafinearts-tsang-tsou-choi-king-of-kowloon-untitled-2001.jpg	https://www.otafinearts.com/artworks/3144-tsang-tsou-choi-king-of-kowloon-untitled-2001/	ink on paper; 119.2 x 200.5 cm
+Ota Fine Arts	Untitled	1994-2017	https://static-assets.artlogic.net/w_3000%2Cc_limit%2Cf_auto%2Cfl_lossy%2Cq_auto/artlogicstorage/otafinearts/images/view/0b22198239ddf25233a3b0b6d1905420j/otafinearts-tsang-tsou-choi-king-of-kowloon-untitled-1994-2017.jpg	https://www.otafinearts.com/artworks/3231-tsang-tsou-choi-king-of-kowloon-untitled-1994-2017/	oil on board and photo document
+Ota Fine Arts	Calligraphy on Scooter	2002	https://static-assets.artlogic.net/w_3000%2Cc_limit%2Cf_auto%2Cfl_lossy%2Cq_auto/artlogicstorage/otafinearts/images/view/4d0bfb909606c6fc6d1cdb8c0715b94fj/otafinearts-tsang-tsou-choi-king-of-kowloon-calligraphy-on-scooter-2002.jpg	https://www.otafinearts.com/artworks/3247-tsang-tsou-choi-king-of-kowloon-calligraphy-on-scooter-2002/	3D object; ink on scooter; H112 x W78 x L178 cm
+Ota Fine Arts	Untitled	2003	https://static-assets.artlogic.net/w_3000%2Cc_limit%2Cf_auto%2Cfl_lossy%2Cq_auto/artlogicstorage/otafinearts/images/view/dcb97c9b8f9d1c04467c31605a0d4864j/otafinearts-tsang-tsou-choi-king-of-kowloon-untitled-2003.jpg	https://www.otafinearts.com/artworks/3225-tsang-tsou-choi-king-of-kowloon-untitled-2003/	acrylic on canvas; 126.5 x 272 cm
+Ota Fine Arts	Untitled	2002	https://static-assets.artlogic.net/w_3000%2Cc_limit%2Cf_auto%2Cfl_lossy%2Cq_auto/artlogicstorage/otafinearts/images/view/a2879c6fb381f0a3b86e19759bd76155j/otafinearts-tsang-tsou-choi-king-of-kowloon-2002.jpg	https://www.otafinearts.com/artworks/3248-tsang-tsou-choi-king-of-kowloon-2002/	ink on paper; Ota page title displays "2002"; 54 x 71 cm
+Sotheby's	Signed work / Lot 35	2004	https://sothebys-com.brightspotcdn.com/dims4/default/4d828a1/2147483647/strip/true/crop/2000x1907+0+0/resize/2880x2748!/quality/90/?url=http%3A%2F%2Fsothebys-brightspot-migration.s3.amazonaws.com%2F4b%2F48%2Fe0%2F643a946d3cbe09a9b5fbee64be5cc6aa027d0d616285cc11510b297fd4%2F059hk0686-8y5g3.jpg	https://www.sothebys.com/en/auctions/ecatalogue/2016/they-would-be-kings-street-art-curated-by-steve-lazarides-hk0686/lot.35.html	Sotheby's states signed in Chinese; unique; height 20.3 cm
+Christie's	Untitled / Lot 164		https://www.christies.com/img/LotImages/2022/HGK/2022_HGK_19900_0164_000(tsang_tsou_choi_untitled062800).jpg?mode=max, https://www.christies.com/img/LotImages/2022/HGK/2022_HGK_19900_0164_001(tsang_tsou_choi_untitled062807).jpg?mode=max	https://www.christies.com/en/lot/lot-6376954	Two Christie image assets for same work; measurements W 96.5 x H 177.5 cm
+Wikimedia Commons	Hung Hom graffiti	2001	https://upload.wikimedia.org/wikipedia/commons/2/2f/Emperor_of_Kowloon%2C_Hung_Hom_%E7%B4%85%E7%A3%A1_%286310519734%29.jpg	https://commons.wikimedia.org/wiki/File:Emperor_of_Kowloon,_Hung_Hom_%E7%B4%85%E7%A3%A1_(6310519734).jpg	Photographed 2001
+Wikimedia Commons	Kwun Tong Road Children's Playground graffiti	photo 2010	https://upload.wikimedia.org/wikipedia/commons/6/65/Tsang_Graffiti_191210_1.JPG	https://commons.wikimedia.org/wiki/File:Tsang_Graffiti_191210_1.JPG	Photographed 19 Dec 2010
+Wikimedia Commons	Ping Shek Estate protected pole	photo 2010	https://upload.wikimedia.org/wikipedia/commons/1/1d/Tsang_Graffiti_191210_2.JPG, https://upload.wikimedia.org/wikipedia/commons/5/5b/Tsang_Graffiti_191210_3.JPG	https://commons.wikimedia.org/wiki/File:Tsang_Graffiti_191210_2.JPG	3D/cylindrical public object; two complementary angles grouped
+HKU Teaching Site	Tsang Tsou Choi's Calligraphy Graffiti	1956-2007	https://learning.hku.hk/ccch9051/group-24/files/original/c3e0825ffefabdd8896fe5ccc55d6462.jpg	https://learning.hku.hk/ccch9051/group-24/items/show/35	Omeka teaching item; generic date range from item
+HKU Museum / Virtual Exhibition	Untitled (HKU.Ca.2023.2643)		https://static.wixstatic.com/media/23c78b_353e71b0653e4b4e9f2c8c8a9fc83870~mv2.png/v1/fill/w_1602%2Ch_814%2Cal_c%2Cq_90%2Cusm_0.66_1.00_0.01%2Cenc_avif%2Cquality_auto/Kowloon%20King2_0_5x.png	https://virtual2.umag.hku.hk/copy-of-old-exhibits	marker on paper; 35 x 69 cm; gift of King of Kowloon Culture & Art Foundation
+Hong Kong Walker	Mong Kok railway bridge underpass work	rediscovered 2022; likely 1990s	https://www.hkwl.org/wp-content/uploads/2022/04/FotoJet-4_%E5%89%AF%E6%9C%AC.jpg?v=1649219047	https://www.hkwl.org/article/5419-%E3%80%8C%E4%B9%9D%E9%BE%8D%E7%9A%87%E5%B8%9D%E3%80%8D%E6%9B%BE%E7%81%B6%E8%B2%A1%E4%BD%9C%E5%93%81%E9%87%8D%E7%8F%BE%E6%97%BA%E8%A7%92%E9%90%B5%E8%B7%AF%E6%A9%8B%E4%B8%8B-%E6%88%96%E7%82%BA%E9%A6%99/	Composite news image; used because it documents a rediscovered public work`;
+
+const headers = ["Source", "Title", "Est. year/date", "Image link(s)", "Reference", "Notes"];
+const rows = ROWS_TSV.trim().split("\n").slice(1).map(line => {
+  const cells = line.split("\t");
+  return Object.fromEntries(headers.map((h, i) => [h, cells[i] || ""]));
+});
+
+const sourceFilter = document.querySelector("#sourceFilter");
+const search = document.querySelector("#search");
+const tbody = document.querySelector("#rows");
+const count = document.querySelector("#count");
+const csvBox = document.querySelector("#csvBox");
+
+function csvEscape(value) {
+  const v = String(value || "");
+  return /[",\n]/.test(v) ? `"${v.replaceAll('"', '""')}"` : v;
+}
+
+function toCsv(data) {
+  return [headers.map(csvEscape).join(","), ...data.map(row => headers.map(h => csvEscape(row[h])).join(","))].join("\n");
+}
+
+function firstImage(images) {
+  return images.split(",").map(s => s.trim()).filter(Boolean)[0] || "";
+}
+
+function render() {
+  const q = search.value.trim().toLowerCase();
+  const source = sourceFilter.value;
+  const filtered = rows.filter(row => {
+    const haystack = headers.map(h => row[h]).join(" ").toLowerCase();
+    return (!source || row.Source === source) && (!q || haystack.includes(q));
+  });
+  tbody.innerHTML = "";
+  for (const row of filtered) {
+    const tr = document.createElement("tr");
+    const img = firstImage(row["Image link(s)"]);
+    tr.innerHTML = `
+      <td class="thumb">${img ? `<a href="${img}" target="_blank" rel="noreferrer"><img loading="lazy" src="${img}" alt=""></a>` : ""}</td>
+      <td class="source">${row.Source}</td>
+      <td class="title">${row.Title || "<span class='muted'>Untitled / unknown</span>"}</td>
+      <td class="date">${row["Est. year/date"] || "<span class='muted'>unknown</span>"}</td>
+      <td class="links">${row["Image link(s)"]}</td>
+      <td><a href="${row.Reference}" target="_blank" rel="noreferrer">source</a></td>
+      <td class="notes">${row.Notes}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+  count.textContent = `${filtered.length} / ${rows.length} rows`;
+  csvBox.value = toCsv(filtered);
+}
+
+for (const source of [...new Set(rows.map(r => r.Source))].sort()) {
+  const option = document.createElement("option");
+  option.value = source;
+  option.textContent = source;
+  sourceFilter.appendChild(option);
+}
+
+search.addEventListener("input", render);
+sourceFilter.addEventListener("change", render);
+document.querySelector("#copyCsv").addEventListener("click", async () => {
+  csvBox.value = toCsv(rows);
+  await navigator.clipboard.writeText(csvBox.value);
+});
+document.querySelector("#toggleCsv").addEventListener("click", event => {
+  const visible = csvBox.style.display === "block";
+  csvBox.style.display = visible ? "none" : "block";
+  event.currentTarget.textContent = visible ? "Show CSV" : "Hide CSV";
+});
+render();
+  </script>
+</body>
+</html>
